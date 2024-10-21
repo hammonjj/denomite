@@ -6,16 +6,33 @@ import { AuditLogService } from '../services/auditLogService.ts';
 import { AdminController } from '../controllers/adminController.ts';
 import { UserRepository } from '../repositories/userRepository.ts';
 import { USE_TEST_DB } from '../environmentVariables.ts';
+import { AdminRepository } from '../repositories/adminRepository.ts';
+import { AdminService } from '../services/adminService.ts';
+import { UserGroupController } from '../controllers/userGroupController.ts';
+import { UserGroupService } from '../services/userGroupService.ts';
+import { GroupRepository } from '../repositories/groupRepository.ts';
+import { GroupService } from '../services/groupService.ts';
+import { UserGroupRepository } from '../repositories/userGroupRepository.ts';
+import { GroupController } from '../controllers/groupController.ts';
 
-// Initialize the DI container
 export function initializeDependencies() {
   container.register("Database", Database, [], [USE_TEST_DB], { singleton: true });
+  container.register("AdminRepository", AdminRepository, [Database]);
+  container.register("UserGroupRepository", UserGroupRepository, [Database]);
   container.register("UserRepository", UserRepository, [Database]);
-  container.register("UserService", UserService, [UserRepository]);
-  container.register("UserController", UserController, [UserService]);
   container.register("AuditLogRepository", AuditLogRepository, [Database]);
+  container.register("GroupRepository", GroupRepository, [Database]);
+
+  container.register("AdminService", AdminService, [AdminRepository]);
+  container.register("UserService", UserService, [UserRepository]);
   container.register("AuditLogService", AuditLogService, [AuditLogRepository]);
-  container.register("AdminController", AdminController, [AuditLogService, UserService]);
+  container.register("GroupService", GroupService, [GroupRepository]);
+  container.register("UserGroupService", UserGroupService, [UserGroupRepository]);
+
+  container.register("AdminController", AdminController, [AdminService]);
+  container.register("UserController", UserController, [UserService]);
+  container.register("GroupController", GroupController, [GroupService]);
+  container.register("UserGroupController", UserGroupController, [UserGroupService]);
 }
 
 type Constructor<T> = new (...args: any[]) => T;

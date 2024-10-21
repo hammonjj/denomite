@@ -1,32 +1,50 @@
 {
   "users": [
     {
-      "id": "1",
+      "id": 1,
       "name": "John Doe",
-      "email": "john@example.com",
-      "role": "admin"
+      "email": "john@example.com"
     },
     {
-      "id": "2",
+      "id": 2,
       "name": "Jane Smith",
-      "email": "jane@example.com",
-      "role": "user"
+      "email": "jane@example.com"
     }
   ],
   "auditLogs": [
     {
-      "id": "1",
-      "adminId": "1",
+      "id": 1,
+      "userId": 1,
       "action": "User login",
-      "details": "John logged in",
-      "timestamp": "2023-10-01T12:00:00Z"
+      "details": "User John logged in",
+      "timestamp": "2024-10-01T12:00:00Z"
     },
     {
-      "id": "2",
-      "adminId": "1",
+      "id": 2,
+      "userId": 2,
       "action": "User logout",
-      "details": "John logged out",
-      "timestamp": "2023-10-01T13:00:00Z"
+      "details": "User Jane logged out",
+      "timestamp": "2024-10-01T13:00:00Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "name": "admin"
+    },
+    {
+      "id": 2,
+      "name": "user"
+    }
+  ],
+  "userGroups": [
+    {
+      "userId": 1,
+      "groupId": 1
+    },
+    {
+      "userId": 2,
+      "groupId": 2
     }
   ]
 }

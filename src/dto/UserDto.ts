@@ -1,6 +1,6 @@
-export interface CreateUserDto {
+export interface UserDto {
+  id: number;
   name: string;
   email: string;
   groupId: number;
-  password: string;
 }

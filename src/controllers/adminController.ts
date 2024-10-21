@@ -1,56 +1,102 @@
-import { Response, Context } from '@oak/oak';
-import { Eta } from '@eta-dev/eta';
-import { AuditLogService } from '../services/auditLogService.ts';
-import type { UserService } from '../services/userService.ts';
-import { AuditLogDto } from '../dto/auditLogDto.ts';
+import { Response, type RouterContext } from "@oak/oak";
+import { Eta } from "@eta-dev/eta";
+import { AdminService } from "../services/adminService.ts";
 
 export class AdminController {
-  private userService: UserService;
-  private auditLogService: AuditLogService;
+  private adminService: AdminService;
 
-  constructor(
-    auditLogService: AuditLogService,
-    userService: UserService,
-  ) {
-    this.auditLogService = auditLogService;
-    this.userService = userService;
+  constructor(adminService: AdminService) {
+    this.adminService = adminService;
   }
 
   async serveAdminInterface({ response }: { response: Response }) {
     const eta = new Eta({ views: `${Deno.cwd()}/src/templates` });
 
-    const body = await eta.render('admin.eta', { title: 'Admin Panel' });
-    if (body) {
-      response.body = body;
-    } else {
+    try {
+      const tables = await this.adminService.getAllTables();
+      console.log(tables);
+      const body = await eta.render("admin.eta", { tables });
+
+      if (body) {
+        response.body = body;
+      } else {
+        response.status = 500;
+        response.body = { error: "Failed to render admin interface." };
+      }
+    } catch (error) {
       response.status = 500;
-      response.body = { error: 'Failed to render admin interface.' };
+      response.body = { error: "An error occurred while retrieving the admin interface." };
     }
   }
 
-  async serveUserManagement(ctx: Context) {
-    const users = await this.userService.getAllUsers();
-    const eta = new Eta({ views: `${Deno.cwd()}/src/templates` });
+  async serveTableData(ctx: RouterContext<"/admin/tables/:tableName">) {
+    const tableName = ctx.params.tableName;
 
-    const body = await eta.render('users.eta', { users });
-    if (body) {
-      ctx.response.body = body;
-    } else {
+    if (!tableName) {
+      ctx.response.status = 400;
+      ctx.response.body = { error: "Table name is required" };
+      return;
+    }
+
+    try {
+      const tableData = await this.adminService.getTableData(tableName);
+      const eta = new Eta({ views: `${Deno.cwd()}/src/templates` });
+      const body = await eta.render("tableData.eta", { tableName, tableData });
+
+      if (body) {
+        ctx.response.body = body;
+      } else {
+        ctx.response.status = 500;
+        ctx.response.body = { error: "Failed to render table data." };
+      }
+    } catch (error) {
       ctx.response.status = 500;
-      ctx.response.body = { error: 'Failed to render users.' };
+      ctx.response.body = { message: (error as Error).message };
     }
   }
 
-  async serveAuditLogs(ctx: Context) {
-    const logs: AuditLogDto[] = await this.auditLogService.getLogs();
-    const eta = new Eta({ views: `${Deno.cwd()}/src/templates` });
+  async saveTableData(ctx: RouterContext<"/admin/tables/:tableName/save">) {
+    const tableName = ctx.params.tableName;
 
-    const body = await eta.render('logs.eta', { logs });
-    if (body) {
-      ctx.response.body = body;
-    } else {
-      ctx.response.status = 500;
-      ctx.response.body = { error: 'Failed to render audit logs.' };
+    if (!tableName) {
+      ctx.response.status = 400;
+      ctx.response.body = { error: "Table name is required" };
+      return;
     }
+
+    let jsonBody = null;
+    if (ctx.request.body.type() === "form") {
+      const body = await ctx.request.body.formData();
+      
+      jsonBody = {} as { [key: string]: any };
+      for (const [key, value] of body.entries()) {
+        jsonBody[key] = value;
+      }
+    } else {
+      ctx.response.status = 400;
+      ctx.response.body = { error: "Expected JSON body" };
+      return;
+    }
+
+    if (!jsonBody) {
+      ctx.response.status = 400;
+      ctx.response.body = { error: "Invalid request body" };
+      return;
+    }
+
+    try {
+      await this.adminService.saveTableData(tableName, jsonBody);
+      ctx.response.redirect(`/admin/tables/${tableName}`);
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Failed to save table data" };
+    }
+  }
+
+  async deleteTableData(ctx: RouterContext<"/admin/tables/:tableName/delete/:id">) {
+    const tableName = ctx.params.tableName;
+    const id = ctx.params.id;
+    await this.adminService.deleteTableData(tableName, +id);
+    ctx.response.redirect(`/admin/tables/${tableName}`);
   }
 }

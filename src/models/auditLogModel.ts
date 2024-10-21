@@ -1,9 +1,8 @@
-export interface AuditLog {
-  id: string;
-  adminId: string;
-  action: string;
-  details: string;
-  timestamp: Date;
-}
+import { SSQLTable } from "smallormSqlite";
 
-export const auditLogs: AuditLog[] = [];
+export class AuditLogModel extends SSQLTable {
+  userId!: number;
+  action!: string;
+  details?: string;
+  timestamp!: string;
+}

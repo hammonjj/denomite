@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Table: <%= it.tableName %></title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+  <script>
+    function showModal(record = {}) {
+      const modal = document.getElementById("editModal");
+      const form = modal.querySelector("form");
+
+      // Populate form fields with record data or clear for new record
+      Object.keys(record).forEach(key => {
+        if (form.elements[key]) {
+          form.elements[key].value = record[key] || "";
+        }
+      });
+      
+      modal.style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    function confirmDelete(recordId) {
+      if (confirm("Are you sure you want to delete this record?")) {
+        // Handle delete action, e.g., send a delete request to the server
+        window.location.href = `/admin/tables/<%= it.tableName %>/delete/${recordId}`;
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Data from Table: <%= it.tableName %></h1>
+    <a href="/admin">Back to Admin Panel</a>
+    <button class="create-btn" onclick="showModal()">Create New Record</button>
+  </header>
+
+  
+
+  <div class="table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <% Object.keys(it.tableData[0]).forEach(key => { %>
+        <th><%= key %></th>
+        <% }) %>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% it.tableData.forEach(row => { %>
+      <tr>
+        <% Object.values(row).forEach(value => { %>
+        <td><%= value %></td>
+        <% }) %>
+        <td>
+          <button onclick='showModal(<%= JSON.stringify(row) %>)'>Edit</button>
+          <button class="delete" onclick='confirmDelete(<%= row.id %>)'>Delete</button>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+  <!-- Modal for Create/Edit -->
+  <div id="editModal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <form method="POST" action="/admin/tables/<%= it.tableName %>/save">
+        <% Object.keys(it.tableData[0]).forEach(key => { %>
+          <label for="<%= key %>"><%= key %></label>
+          <input type="text" id="<%= key %>" name="<%= key %>" value="" />
+        <% }) %>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

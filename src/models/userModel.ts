@@ -1,6 +1,12 @@
-export interface UserModel {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
+import { SSQLTable } from "smallormSqlite";
+import { hashPassword } from "../utils/hashPassword.ts";
+
+export class UserModel extends SSQLTable {
+  name!: string;
+  email!: string;
+  password!: string;
+
+  async setPassword(plainPassword: string) {
+    this.password = await hashPassword(plainPassword);
+  }
 }

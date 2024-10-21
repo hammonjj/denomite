@@ -6,6 +6,8 @@ import { PORT } from './environmentVariables.ts';
 import { initializeDependencies } from "./utils/diContainer.ts";
 
 import { StaticFileMiddleware } from "./middleware/staticFileMiddleware.ts";
+import { groupRoutes } from './routes/groupRoutes.ts';
+import { userGroupRoutes } from './routes/userGroupRoutes.ts';
 
 initializeDependencies();
 
@@ -22,6 +24,14 @@ app.use(userRoutes.allowedMethods());
 // Admin Interface Routes
 app.use(adminRoutes.routes());
 app.use(adminRoutes.allowedMethods());
+
+// Group Routes
+app.use(groupRoutes.routes());
+app.use(groupRoutes.allowedMethods());
+
+// User Group Routes
+app.use(userGroupRoutes.routes());
+app.use(userGroupRoutes.allowedMethods());
 
 app.listen({ port: PORT });
 

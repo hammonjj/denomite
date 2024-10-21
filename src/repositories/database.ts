@@ -1,105 +1,63 @@
-import { DB as SQLiteDB } from "sqlite";
+import { SSQL } from "smallormSqlite";
+import { UserModel } from "../models/userModel.ts";
+import { AuditLogModel } from "../models/auditLogModel.ts";
 import { readJson } from "readJson";
+import { GroupModel } from '../models/groupModel.ts';
+import { UserGroupModel } from '../models/userGroupModel.ts';
 
 export class Database {
-  private sqliteDB: SQLiteDB | null = null;
+  private orm: SSQL;
 
   constructor(private useTestDB: boolean) {
-    if (useTestDB) {
-      this.initializeInMemoryDB().catch((err) => {
-        console.error("Failed to initialize in-memory DB:", err);
-      });
-    } else {
-      this.initializeSqliteDB();
-    }
+    const dbFile = this.useTestDB ? ":memory:" : "./database.sqlite";
+    this.orm = new SSQL(dbFile, [UserModel, AuditLogModel, GroupModel, UserGroupModel]);
+
+    this.initializeDatabase().catch((err) => {
+      console.error("Failed to initialize the database:", err);
+    });
   }
 
-  private async initializeInMemoryDB(): Promise<void> {
-    console.log("Using in-memory SQLite test database");
+  getORM(): SSQL {
+    return this.orm;
+  }
 
-    try {
-      this.sqliteDB = new SQLiteDB(":memory:");
-      this.createTables();
-
+  private async initializeDatabase(): Promise<void> {
+    if (this.useTestDB) {
       const dummyData = await readJson(`${Deno.cwd()}/src/repositories/dummyData.json`);
-      this.loadDummyDataIntoDB(dummyData);
-
-    } catch (error) {
-      throw new Error(`Error initializing in-memory DB: ${error instanceof Error ? error.message : "Unknown error"}`);
+      await this.loadDummyDataIntoDB(dummyData);
     }
-  }
-
-  private initializeSqliteDB(): void {
-    console.log("Using SQLite database");
-    try {
-      this.sqliteDB = new SQLiteDB("./database.sqlite");
-
-      this.createTables();
-
-    } catch (error) {
-      throw new Error(`Error initializing SQLite DB: ${error instanceof Error ? error.message : "Unknown error"}`);
-    }
-  }
-
-  private createTables(): void {
-    if (!this.sqliteDB) {
-      throw new Error("Database is not initialized.");
-    }
-
-    this.sqliteDB.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
-        name TEXT,
-        email TEXT,
-        role TEXT
-      )
-    `);
-
-    this.sqliteDB.query(`
-      CREATE TABLE IF NOT EXISTS audit_logs (
-        id TEXT PRIMARY KEY,
-        adminId TEXT,
-        action TEXT,
-        details TEXT,
-        timestamp TEXT
-      )
-    `);
-
-    console.log("Tables created successfully");
   }
 
   private loadDummyDataIntoDB(dummyData: any): void {
-    if (!this.sqliteDB) {
-      throw new Error("In-memory SQLite DB is not initialized.");
-    }
-
     for (const user of dummyData.users) {
-      this.sqliteDB.query(
-        "INSERT INTO users (id, name, email, role) VALUES (?, ?, ?, ?)",
-        [user.id, user.name, user.email, user.role]
-      );
+      const newUser = new UserModel();
+      newUser.name = user.name;
+      newUser.email = user.email;
+      this.orm.save(newUser);
     }
 
     for (const log of dummyData.auditLogs) {
-      this.sqliteDB.query(
-        "INSERT INTO audit_logs (id, adminId, action, details, timestamp) VALUES (?, ?, ?, ?, ?)",
-        [log.id, log.adminId, log.action, log.details, log.timestamp]
-      );
+      const newLog = new AuditLogModel();
+      newLog.userId = log.userId;
+      newLog.action = log.action;
+      newLog.details = log.details;
+      newLog.timestamp = log.timestamp;
+      this.orm.save(newLog);
+    }
+
+    for (const group of dummyData.groups) {
+      const newGroup = new GroupModel();
+      newGroup.name = group.name;
+      this.orm.save(newGroup);
+    }
+
+    for (const userGroup of dummyData.userGroups) {
+      const newUserGroup = new UserGroupModel();
+      newUserGroup.userId = userGroup.userId;
+      newUserGroup.groupId = userGroup.groupId;
+      this.orm.save(newUserGroup);
     }
 
     console.log("Dummy data loaded into in-memory DB");
-  }
-
-  query(query: string, params: any[] = []): any {
-    if (!this.sqliteDB) {
-      throw new Error("SQLite DB is not initialized.");
-    }
-    return this.sqliteDB.query(query, params);
-  }
-
-  closeDatabase(): void {
-    if (this.sqliteDB) {
-      this.sqliteDB.close();
-    }
   }
 }

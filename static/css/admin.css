@@ -3,6 +3,8 @@ body {
   background-color: #f4f4f4;
   margin: 0;
   padding: 0;
+  align-items: flex-start;
+  min-height: 100vh;
 }
 
 header {
@@ -10,25 +12,38 @@ header {
   color: white;
   padding: 10px;
   text-align: center;
+  position: relative;
 }
 
 h1 {
   font-size: 24px;
 }
 
-table {
+.table-container {
+  display: flex;
+  justify-content: center;
   width: 100%;
   margin-top: 20px;
-  border-collapse: collapse;
 }
 
-table, th, td {
+table.data-table {
+  width: 80%;
+  max-width: 1000px;
+  margin: 20px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+table.data-table, th, td {
   border: 1px solid black;
 }
 
 th, td {
   padding: 10px;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 th {
@@ -39,9 +54,64 @@ th {
 a {
   text-decoration: none;
   color: #333;
+  display: inline-block;
+  margin-bottom: 10px;
 }
 
 footer {
   margin-top: 20px;
   text-align: center;
+}
+
+/* Position the create button under the Back to Admin link */
+button.create-btn {
+  position: absolute;
+  top: 60px; /* Adjust this to move the button below the link */
+  left: 10px;
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+button.create-btn:hover {
+  background-color: #218838;
+}
+
+button.delete {
+  background-color: #dc3545;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+button.delete:hover {
+  background-color: #c82333;
+}
+
+/* Modal Styles */
+#editModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
 }

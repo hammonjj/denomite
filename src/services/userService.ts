@@ -1,17 +1,27 @@
+import type { CreateUserDto } from '../dto/createUserDto.ts';
+import type { UserDto } from '../dto/UserDto.ts';
 import { UserRepository } from "../repositories/userRepository.ts";
 
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  private userRepository: UserRepository;
 
-  async getAllUsers() {
+  constructor(userRepository: UserRepository) {
+    this.userRepository = userRepository;
+  }
+
+  getAllUsers(): UserDto[] {
     return this.userRepository.getAllUsers();
   }
 
-  async getUserById(id: string) {
+  getUserById(id: number): UserDto | null {
     return this.userRepository.getUserById(id);
   }
 
-  async createUser(userData: any) {
+  createUser(userData: CreateUserDto): Promise<UserDto> {
     return this.userRepository.createUser(userData);
+  }
+
+  deleteUser(id: number) {
+    this.userRepository.deleteUser(id);
   }
 }

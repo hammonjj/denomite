@@ -3,22 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= it.title %></title>
+  <title>Admin Panel</title>
   <link rel="stylesheet" href="/static/css/admin.css">
 </head>
 <body>
   <header>
     <h1>Admin Panel</h1>
-    <p>Manage users, view audit logs, and more.</p>
+    <p>Manage database tables and more.</p>
   </header>
   <nav>
     <ul>
-      <li><a href="/admin/users">Manage Users</a></li>
-      <li><a href="/admin/logs">View Audit Logs</a></li>
+      <% it.tables.forEach(table => { %>
+      <li><a href="/admin/tables/<%= table.tableName %>"><%= table.tableName %></a></li>
+      <% }) %>
     </ul>
   </nav>
-  <footer>
-    <p>&copy; 2024 Admin Panel</p>
-  </footer>
 </body>
 </html>

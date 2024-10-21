@@ -12,6 +12,7 @@ const router = new Router();
 router
   .post("/users", injectUserController, (ctx: Context) => ctx.state.userController.createUser(ctx))
   .get("/users", injectUserController, (ctx: Context) => ctx.state.userController.getAllUsers(ctx))
-  .get("/users/:id", injectUserController, (ctx: Context) => ctx.state.userController.getUserById(ctx));
+  .get("/users/:id", injectUserController, (ctx: Context) => ctx.state.userController.getUserById(ctx)
+  .delete("/users/:id", injectUserController, (ctx: Context) => ctx.state.userController.deleteUser(ctx)));
 
 export { router as userRoutes };
