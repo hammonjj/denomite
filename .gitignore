@@ -24,7 +24,7 @@ coverage
 *.lcov
 
 # SQLite database files
-*.sqlites
+*.sqlite
 
 # nyc test coverage
 .nyc_output
