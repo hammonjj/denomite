@@ -1,5 +1,6 @@
 import type { CreateUserDto } from '../dto/createUserDto.ts';
-import type { UserDto } from '../dto/UserDto.ts';
+import type { UserDto } from '../dto/userDto.ts';
+
 import { UserRepository } from "../repositories/userRepository.ts";
 
 export class UserService {
