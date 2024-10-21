@@ -1,25 +1,31 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "John Doe",
-      "email": "john@example.com"
+      "email": "john@example.com",
+      "role": "admin"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Jane Smith",
-      "email": "jane@example.com"
+      "email": "jane@example.com",
+      "role": "user"
     }
   ],
   "auditLogs": [
     {
-      "id": 1,
+      "id": "1",
+      "adminId": "1",
       "action": "User login",
+      "details": "John logged in",
       "timestamp": "2023-10-01T12:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
+      "adminId": "1",
       "action": "User logout",
+      "details": "John logged out",
       "timestamp": "2023-10-01T13:00:00Z"
     }
   ]

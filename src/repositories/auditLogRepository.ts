@@ -8,12 +8,11 @@ export class AuditLogRepository {
   }
 
   async getLogs() {
-    const dbInstance = this.db.getDatabase();
-    return await dbInstance.collection("auditLogs").find();
+    return this.db.query("SELECT * FROM audit_logs");
   }
 
   async addLog(logData: any) {
-    const dbInstance = this.db.getDatabase();
-    return await dbInstance.collection("auditLogs").insertOne(logData);
+    return this.db.query("INSERT INTO audit_logs (id, action, details, timestamp) VALUES (?, ?, ?, ?)", 
+      [logData.id, logData.action, logData.details, logData.timestamp]);
   }
 }

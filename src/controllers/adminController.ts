@@ -1,7 +1,8 @@
-import { Response, Context } from "@oak/oak";
-import { Eta } from "@eta-dev/eta";
-import { AuditLogService } from "../services/auditLogService.ts";
+import { Response, Context } from '@oak/oak';
+import { Eta } from '@eta-dev/eta';
+import { AuditLogService } from '../services/auditLogService.ts';
 import type { UserService } from '../services/userService.ts';
+import { AuditLogDto } from '../dto/auditLogDto.ts';
 
 export class AdminController {
   private userService: UserService;
@@ -16,40 +17,40 @@ export class AdminController {
   }
 
   async serveAdminInterface({ response }: { response: Response }) {
-    const eta = new Eta({ views: `${Deno.cwd()}/templates` });
+    const eta = new Eta({ views: `${Deno.cwd()}/src/templates` });
 
-    const body = await eta.render("admin.eta", { title: "Admin Panel" });
+    const body = await eta.render('admin.eta', { title: 'Admin Panel' });
     if (body) {
       response.body = body;
     } else {
       response.status = 500;
-      response.body = { error: "Failed to render admin interface." };
+      response.body = { error: 'Failed to render admin interface.' };
     }
   }
 
   async serveUserManagement(ctx: Context) {
     const users = await this.userService.getAllUsers();
-    const eta = new Eta({ views: `${Deno.cwd()}/templates` });
+    const eta = new Eta({ views: `${Deno.cwd()}/src/templates` });
 
-    const body = await eta.render("users.eta", { users });
+    const body = await eta.render('users.eta', { users });
     if (body) {
       ctx.response.body = body;
     } else {
       ctx.response.status = 500;
-      ctx.response.body = { error: "Failed to render users." };
+      ctx.response.body = { error: 'Failed to render users.' };
     }
   }
 
   async serveAuditLogs(ctx: Context) {
-    const logs = await this.auditLogService.getLogs();
-    const eta = new Eta({ views: `${Deno.cwd()}/templates` });
+    const logs: AuditLogDto[] = await this.auditLogService.getLogs();
+    const eta = new Eta({ views: `${Deno.cwd()}/src/templates` });
 
-    const body = await eta.render("logs.eta", { logs });
+    const body = await eta.render('logs.eta', { logs });
     if (body) {
       ctx.response.body = body;
     } else {
       ctx.response.status = 500;
-      ctx.response.body = { error: "Failed to render audit logs." };
+      ctx.response.body = { error: 'Failed to render audit logs.' };
     }
   }
 }

@@ -1,4 +1,5 @@
 import { AuditLogRepository } from "../repositories/auditLogRepository.ts";
+import { AuditLogDto } from "../dto/auditLogDto.ts";
 
 export class AuditLogService {
   private auditLogRepository: AuditLogRepository;
@@ -7,16 +8,18 @@ export class AuditLogService {
     this.auditLogRepository = auditLogRepository;
   }
 
-  async logAction(action: string, details: any) {
-    const logEntry = {
+  async logAction(action: string, details: any): Promise<AuditLogDto> {
+    const logEntry: AuditLogDto = {
+      id: Date.now(),
       action,
       details,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
-    return this.auditLogRepository.addLog(logEntry);
+    await this.auditLogRepository.addLog(logEntry);
+    return logEntry;
   }
 
-  async getLogs() {
+  async getLogs(): Promise<AuditLogDto[]> {
     return this.auditLogRepository.getLogs();
   }
 }

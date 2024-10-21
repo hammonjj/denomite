@@ -10,7 +10,7 @@ export class UserRepository {
   }
   
   async getAllUsers() {
-    return await this.db.query("users");
+    return this.db.query("SELECT * FROM users");
   }
 
   async getUserById(id: string) {
@@ -18,6 +18,6 @@ export class UserRepository {
   }
 
   async createUser(userData: CreateUserDto) {
-    return this.db.query("INSERT INTO users (name, email) VALUES (?, ?)", [userData.name, userData.email]);
+    return this.db.query("INSERT INTO users (id, name, email, role) VALUES (?, ?, ?, ?)", [userData.id, userData.name, userData.email, userData.role]);
   }
 }

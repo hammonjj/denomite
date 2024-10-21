@@ -24,7 +24,7 @@
       <tr>
         <td><%= log.timestamp %></td>
         <td><%= log.action %></td>
-        <td><%= log.details %></td>
+        <td><%= log.details || 'No details' %></td>
       </tr>
       <% }) %>
     </tbody>

@@ -1,8 +1,8 @@
 {
   "tasks": {
-    "dev": "deno run --env-file --watch src/main.ts",
+    "dev": "deno run --allow-env --allow-read --allow-net --watch src/main.ts",
+    "serve": "deno serve --allow-env --allow-read --allow-net src/main.ts",
 
-    "dev:serve": "deno task dev:api & deno task dev:vite",
     "dev:api": "deno run --allow-env --allow-net src/main.ts",
     "dev:vite": "deno run -A npm:vite"
   },
